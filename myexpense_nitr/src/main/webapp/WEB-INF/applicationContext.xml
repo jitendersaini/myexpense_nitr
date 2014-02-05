@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	   		http://www.springframework.org/schema/context
+	   		http://www.springframework.org/schema/context/spring-context-3.1.xsd
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
+			
+	<context:property-placeholder properties-ref="deployProperties" />
+
+	<!-- Activates various annotations to be detected in bean classes -->
+	<context:annotation-config />
+
+	<!-- Scans the classpath for annotated components that will be auto-registered as Spring beans.
+	 For example @Controller and @Service. Make sure to set the correct base-package -->
+	<context:component-scan base-package="com.expense" />
+
+	<!-- Configures the annotation-driven Spring MVC Controller programming model.
+	Note that, with Spring 3.0, this tag works in Servlet MVC only!  -->
+	
+	<!-- <mvc:view-controller path="/" view-name="login-page/login" /> -->	
+	<mvc:view-controller path="/" view-name="login-page/login" />
+	<mvc:annotation-driven /> 
+	
+	
+	
+	<!-- Static resources mapped for not to scanned by spring for / handler -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />	
+	<mvc:resources mapping="/jquery-ui/**" location="/jquery-ui/" />
+	<mvc:resources mapping="/bar-chart/**" location="/bar-chart/" />	
+	<mvc:resources mapping="/pie-chart/**" location="/pie-chart/" />
+	<mvc:resources mapping="/common-js/**" location="/common-js/" />	
+	<mvc:resources mapping="/common-css/**" location="/common-css/" />
+	<mvc:resources mapping="/jquery-table/**" location="/jquery-table/" />
+	<mvc:resources mapping="/jq-grid/**" location="/jq-grid/" />
+	<mvc:resources mapping="/images/**" location="/images/" />
+	<mvc:resources mapping="/login-form/**" location="/login-form/" />	
+	 
+ 	
+ 	<!-- Imports logging configuration -->
+	<!-- <import resource="trace-context.xml"/> -->
+	
+	<!-- Imports datasource configuration -->
+	<!-- <import resource="trace-context.xml"/>
+	
+	<import resource="MYEXPENSE-data.xml"/>
+	
+	<import resource="MYEXPENSE-security.xml"/>
+	
+	<import resource="MYEXPENSE-mail.xml"/> -->
+	
+	<bean id="deployProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean"
+        p:location="/WEB-INF/mongo.properties" />
+        
+</beans>

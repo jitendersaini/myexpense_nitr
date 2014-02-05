@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	   		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+			http://www.springframework.org/schema/security 
+			http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+	<!-- To use the new expression-based syntax, enable pre-post-annotations. 
+		This uses Spring Security's native annotations which provide more powerful 
+		support than the standards-based @Secured and JSR-250 annotations See Spring 
+		Security 3.1 Reference 2.4 Method Security - http://static.springsource.org/spring-security/site/docs/3.1.x/reference/ns-config.html#ns-protect-pointcut 
+		- http://static.springsource.org/spring-security/site/docs/3.1.x/reference/appendix-namespace.html#d0e8651 
+		See Spring Security 3.1 Referecne 15.1.1 Common Built-In Expressions - http://static.springsource.org/spring-security/site/docs/3.1.x/reference/el-access.html -->
+
+	<security:http pattern="/resources/**" security="none" />	
+	<security:http pattern="/bar-chart/**" security="none" />
+	<security:http pattern="/pie-chart/**" security="none" />
+	<security:http pattern="/jquery-ui/**" security="none" />
+	<security:http pattern="/common-js/**" security="none" />
+	<security:http pattern="/common-css/**" security="none" />
+	<security:http pattern="/jquery-table/**" security="none" />	
+	<security:http pattern="/jq-grid/**" security="none" />
+	<security:http pattern="/images/**" security="none" />
+	<security:http pattern="/login-form/**" security="none" />	
+
+	<security:global-method-security
+		secured-annotations="enabled">
+		<!-- AspectJ pointcut expression that locates our "post" method and applies 
+			security that way <protect-pointcut expression="execution(* bigbank.*Service.post*(..))" 
+			access="ROLE_TELLER"/> -->
+	</security:global-method-security>
+
+	<security:http auto-config="true" access-denied-page="/denied"
+		use-expressions="true" entry-point-ref="authenticationEntryPoint">
+		<security:intercept-url pattern="/admin/**"
+			access="hasRole('ROLE_ADMIN')" />
+		<security:intercept-url pattern="/common/**"
+			access="hasAnyRole('ROLE_USER,ROLE_ADMIN')" />		
+		<security:intercept-url pattern="/_admin"
+			access="hasAnyRole('ROLE_USER,ROLE_ADMIN')" />
+		<security:form-login authentication-failure-url="/"
+			default-target-url="/_admin" />
+		<security:custom-filter ref="captchaCaptureFilter"
+			before="FORM_LOGIN_FILTER" />
+		<security:custom-filter ref="captchaVerifierFilter"
+			after="FORM_LOGIN_FILTER" />
+		<security:logout invalidate-session="true"
+			logout-success-url="/" logout-url="/login/logout" />		
+		<security:session-management
+			session-authentication-error-url="/" invalid-session-url="/" />
+	</security:http>
+
+	<security:authentication-manager>
+		<security:authentication-provider
+			user-service-ref="customUserDetailsService">
+			<security:password-encoder hash="md5" />
+		</security:authentication-provider>
+	</security:authentication-manager>
+	
+	 <bean id="customUserDetailsService" class="com.expense.security.CustomUserDetailsService"/>
+	
+
+	<!-- <bean class="com.libms.security.joomla.JoomlaPasswordEncoder" id="passwordEncoder" 
+		/> -->
+
+	<bean id="authenticationEntryPoint"
+		class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint"
+		p:loginFormUrl="/" />
+	<!-- For capturing CAPTCHA fields -->
+	<bean id="captchaCaptureFilter" class="com.expense.security.captcha.CaptchaCaptureFilter" />
+
+	<!-- For verifying CAPTCHA fields
+	Private key is assigned by the reCATPCHA service -->
+	<bean id="captchaVerifierFilter" class="com.expense.security.captcha.CaptchaVerifierFilter"
+		p:useProxy="false" p:proxyPort="" p:proxyHost="" p:failureUrl="/"
+		p:captchaCaptureFilter-ref="captchaCaptureFilter" p:privateKey="6LeQ79ASAAAAAIijFBBJQ74Ko_lUIVwcy73sYv87" />
+</beans>      
